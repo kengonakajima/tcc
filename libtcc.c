@@ -1509,10 +1509,18 @@ static int rt_get_caller_pc(unsigned long *paddr,
 
     if (level == 0) {
         /* XXX: only support linux */
+#ifdef __DARWIN_UNIX03
+        *paddr = uc->uc_mcontext->__ss.__rip;
+#else
         *paddr = uc->uc_mcontext.gregs[REG_RIP];
+#endif
         return 0;
     } else {
-        fp = uc->uc_mcontext.gregs[REG_RBP];
+#ifdef __DARWIN_UNIX03
+        fp = uc->uc_mcontext->__ss.__rbp;
+#else
+        fp = uc->uc_ mcontext.gregs[REG_RBP];
+#endif        
         for(i=1;i<level;i++) {
             /* XXX: check address validity with program info */
             if (fp <= 0x1000)
